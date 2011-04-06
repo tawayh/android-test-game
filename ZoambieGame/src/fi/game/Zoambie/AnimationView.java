@@ -107,10 +107,8 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		        
 		        // Piirto-metodi
 		        private void doDraw(Canvas canvas) {
-		        	canvas.drawColor(Color.BLACK);	//Alustetaan
-		        	canvas.drawBitmap(background, 0, 0, null);
-		        	//Alla on vanha piirto komento millä tausta tehtiin
-		        	//canvas.drawBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ground), 0, 0, paint);
+		        	canvas.drawBitmap(background, 0, 0, null);	//Alustetaan piirtämällä tausta
+		        	//TODO - tarviiko alla oleva painttia vai toimisiko nopeammin nullilla
 		        	canvas.drawBitmap(player.getBitmap(), player.getX(), player.getY(), paint);
 		        	//TODO piirrä kaikki enemyt listasta
 		        	for (Iterator<Character> it = enemyList.iterator(); it.hasNext();) {
@@ -133,8 +131,8 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 			
 			
 			
-	public int width;
-	public int height;
+	public int screenWidth;
+	public int screenHeight;
     private AnimationThread thread;
     private float pressedX;
     private float pressedY;
@@ -183,24 +181,18 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     	//Nyt siis tulee sekunni välein mörköjä
     	if (System.currentTimeMillis() - lastMeasuredTime > 1000   &&  enemyList.size() < 500) {
 
-    		//Tässä arvotaan aluksi x-koordinaatti minne zombi syntyy
-    		//Tämä väliltä -150 - +550
-    		
-    		//Jos x koordinaatti on ruudun ulkopuolella :
-    		//Y koordinaatti saa arvokseen -50 - +950
-    		
-    		//Jos x on ruudun sisällä niin y = 850 || -50
+    		//ZOmbin random aloitus sijainti
 	    	Character enemy;
 	    	double y = 0;
-	    	double x = (Math.random() * 700) - 150;
+	    	double x = (Math.random() * screenWidth+100) - 50;
 	    	if (x < 0)
-	    		y = (Math.random()*1000) - 50;
-	    	else if (x > 400)
-	    		y = (Math.random()*1000) - 50;
+	    		y = (Math.random()*screenHeight+100) - 50;
+	    	else if (x > 850)
+	    		y = (Math.random()*screenHeight+100) - 50;
 	    	else {
 	    		double rand = Math.random();
 	    		if (rand < 0.5) 
-	    			y = 850;
+	    			y = screenWidth+50;
 	    		else
 	    			y = -50;
 	    	}
@@ -255,11 +247,11 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     // Callback invoked when the surface dimensions change.
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
     	
-    	// samanaikaisesti asetetaan arvot width, height ja
+    	// samanaikaisesti asetetaan arvot screenwidth, -height ja
     	// muokataan background bitmappi oikean kokoiseksi
         synchronized (holder) {
-            width = width;
-            height = height;
+            screenWidth = width;
+            screenHeight = height;
 
             background = Bitmap.createScaledBitmap(background, width, height, true);
         }
