@@ -5,7 +5,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">        
         <fi.game.Zoambie.AnimationView      
-            android:id="@+id/aview"      
+            android:id="@+id/aview"    
             android:layout_width="fill_parent"      
             android:layout_height="fill_parent"/>
 </FrameLayout>

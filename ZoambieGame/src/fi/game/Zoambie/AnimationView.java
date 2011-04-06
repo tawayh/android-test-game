@@ -2,6 +2,7 @@ package fi.game.Zoambie;
 
 import fi.game.Zoambie.R;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -27,6 +28,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		        // Konstruktori
 		        public AnimationThread(SurfaceHolder newSurfaceHolder) {
 		            surfaceHolder = newSurfaceHolder;
+		            background = BitmapFactory.decodeResource(getResources(), R.drawable.ground);
 		            paint = new Paint();
 		            player = new Character( 
 		            	BitmapFactory.decodeResource(getResources(), R.drawable.player),
@@ -63,7 +65,6 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		        // T‰‰ nyt oli monessa esimerkiss‰ mukana
 		        // En tii‰ onko pakollinen
 		        // T‰t‰ vois k‰ytt‰‰ collisionDetectioniin
-		        // Nyt t‰‰ vaan liikuttaa kahta sprite‰
 		        private void updatePhysics() {
 			        player.updateMovement(pressedX, pressedY);
 			        
@@ -107,6 +108,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		        // Piirto-metodi
 		        private void doDraw(Canvas canvas) {
 		        	canvas.drawColor(Color.BLACK);	//Alustetaan
+		        	canvas.drawBitmap(background, 0, 0, null);
 		        	//Alla on vanha piirto komento mill‰ tausta tehtiin
 		        	//canvas.drawBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ground), 0, 0, paint);
 		        	canvas.drawBitmap(player.getBitmap(), player.getX(), player.getY(), paint);
@@ -131,13 +133,15 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 			
 			
 			
-			
+	public int width;
+	public int height;
     private AnimationThread thread;
     private float pressedX;
     private float pressedY;
     //private float lastX;		//Jos ei olla tˆk‰tyy, niin ei liikuta
     //private float lastY;		//Sama juttu
     public Character player;
+    public Bitmap background;
     //public Character enemy;
     //lastMeasuredTimell‰ lasketaan milloin zombeja luodaan
     long lastMeasuredTime = System.currentTimeMillis();;
@@ -250,6 +254,16 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     
     // Callback invoked when the surface dimensions change.
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+    	
+    	// samanaikaisesti asetetaan arvot width, height ja
+    	// muokataan background bitmappi oikean kokoiseksi
+        synchronized (holder) {
+            width = width;
+            height = height;
+
+            background = Bitmap.createScaledBitmap(background, width, height, true);
+        }
+    	
     }
     
     // Callback invoked when the Surface has been created and is ready to be used.
