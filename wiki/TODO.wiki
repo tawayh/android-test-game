@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+# mitä kaikkea pitäis tehdä
 
 = todo =
 
@@ -6,9 +6,14 @@
     * virtual d-pad
     * moottorisahan asento d-padista
     * moottorisaha luokka kuntoon
+    * damage (collision detect)
+    * sijainti aina keskelle pelaajaa
   * zombit
     * random sijainti algoritmi paremmaksi
     * damagen ottaminen ja antaminen
+    * killed zombies listasta eroon
+    * pitäisikö zombies arraylist vaihtaa johonkin toiseen
+    * zombeja syntyy kiihtyvään tahtiin
   * pelaaja
     * omaan luokkaan?
     * liikkuminen orientaation mukaan
@@ -16,13 +21,6 @@
     * animaatiot, mitä kaikkea tarvitsee
     * stuude piirtää graffat
   * muuta
-    * collision detect, mien tehdään
-    * 
-
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+    * collision detect, miten tehdään
+    * menu (oma activity ja viewi
+ 
