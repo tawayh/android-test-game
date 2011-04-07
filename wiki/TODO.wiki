@@ -1,0 +1,28 @@
+#summary One-sentence summary of this page.
+
+= todo =
+
+  * moottorisaha
+    * virtual d-pad
+    * moottorisahan asento d-padista
+    * moottorisaha luokka kuntoon
+  * zombit
+    * random sijainti algoritmi paremmaksi
+    * damagen ottaminen ja antaminen
+  * pelaaja
+    * omaan luokkaan?
+    * liikkuminen orientaation mukaan
+  * grafiikat
+    * animaatiot, mitä kaikkea tarvitsee
+    * stuude piirtää graffat
+  * muuta
+    * collision detect, mien tehdään
+    * 
+
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
