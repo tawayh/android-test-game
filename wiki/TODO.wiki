@@ -11,8 +11,8 @@
   * zombit
     * random sijainti algoritmi paremmaksi
     * damagen ottaminen ja antaminen
-    * killed zombies listasta eroon    //Poistettu 19.4 - käsitellään synkronoidusti threadissa, ettei listaa käsittele samaan aikaan kaksi eri threadia
-    * pitäisikö zombies arraylist vaihtaa johonkin toiseen    //Toimii nykyään LinkedListillä
+    * ~~killed zombies listasta eroon~~
+    * ~~pitäisikö zombies arraylist vaihtaa johonkin toiseen~~
     * zombeja syntyy kiihtyvään tahtiin
   * pelaaja
     * omaan luokkaan?
@@ -23,4 +23,11 @@
   * muuta
     * collision detect, miten tehdään
     * menu (oma activity ja viewi
+
+
+=done=
+  * zombit
+    * ArrayList vaihdettu LinkedListiin
+    * KilledZombies lista poistettu
+    * ZombiListaa käsitellään synkronoidusti, ettei kaksi threadia muokkaa sitä samaan aikaan
  
