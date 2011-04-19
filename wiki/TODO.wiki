@@ -27,7 +27,7 @@
 
 =done=
   * zombit
-    * ArrayList vaihdettu LinkedListiin
-    * KilledZombies lista poistettu
-    * ZombiListaa käsitellään synkronoidusti, ettei kaksi threadia muokkaa sitä samaan aikaan
+    * arraylist vaihdettu linkedlistiin
+    * killedzombies lista poistettu
+    * zombi listaa käsitellään synkronoidusti, ettei kaksi threadia muokkaa sitä samaan aikaan
  
