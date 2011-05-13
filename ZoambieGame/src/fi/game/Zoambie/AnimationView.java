@@ -11,7 +11,10 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     
@@ -106,12 +109,17 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 
 		        	//move image
 
-		        	matrix.setTranslate(player.getX() - (saw.getBitmap().getWidth() / 2), player.getY() - (saw.getBitmap().getWidth() / 2));
+		        	//matrix.setTranslate(player.getX() + (player.getBitmap().getWidth() / 2), player.getY() + (player.getBitmap().getWidth() / 2));
 
 		        	//rotate image, getXPos, getYPos are x & y coords of the image
 
-		        	matrix.postRotate((float)saw.getDirection(), player.getX() - (saw.getBitmap().getWidth() / 2), (float)player.getY() - (saw.getBitmap().getWidth() / 2));
-		        	canvas.drawBitmap(saw.getBitmap(), matrix, paint);
+		        	Matrix newtest = new Matrix();
+		        	newtest.postRotate(-25);
+		        	Bitmap testi_bmp = Bitmap.createBitmap(saw.getBitmap(), 0, 0, saw.getBitmap().getWidth(), saw.getBitmap().getHeight(), newtest, true);
+		        	newtest.setTranslate(player.getX() + (player.getBitmap().getWidth() / 2), player.getY() + (player.getBitmap().getWidth() / 2));
+		        	//matrix.postRotate((float)saw.getDirection(), player.getX() - (saw.getBitmap().getWidth() / 2), (float)player.getY() - (saw.getBitmap().getWidth() / 2));
+		        	//canvas.drawBitmap(saw.getBitmap(), matrix, paint);
+		        	canvas.drawBitmap(testi_bmp, newtest, paint);
 		        	
 		        	
 		        	
@@ -199,19 +207,10 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 
     		//ZOmbin random aloitus sijainti
 	    	Character enemy;
-	    	double y = 0;
-	    	double x = (Math.random() * screenWidth+100) - 50;
-	    	if (x < 0)
-	    		y = (Math.random()*screenHeight+100) - 50;
-	    	else if (x > 850)
-	    		y = (Math.random()*screenHeight+100) - 50;
-	    	else {
-	    		double rand = Math.random();
-	    		if (rand < 0.5) 
-	    			y = screenWidth+50;
-	    		else
-	    			y = -50;
-	    	}
+	    	
+	    	List list = randomZombieLocation();
+	    	double x = (Double) list.get(0);
+	    	double y = (Double) list.get(1);
 	    	
 	    	enemy = new Character( 
 		            BitmapFactory.decodeResource(getResources(), R.drawable.enemy),
@@ -224,6 +223,56 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     	}
     }
     
+    public List randomZombieLocation() {
+    	List list = new ArrayList();
+    	int side = 0;
+    	double x = 0;
+    	double y = 0;
+    	
+    	//Randomly choose the side of the screen where the zombie is going to spawn
+    	double random = Math.random();
+    	if(random <= 0.25) {
+    		side = 1;
+    	}
+    	else if(random > 0.25 && random <= 0.50) {
+    		side = 2;
+    	}
+    	else if(random > 0.50 && random <=0.75) {
+    		side = 3;
+    	}
+    	else if(random > 0.75) {
+    		side = 4;
+    	}
+    	
+    	//Randomly choose the spot where the zombie is going to spawn on the specific side
+    	if (side == 1) {
+    		x = screenWidth;
+    		y = (int) (screenHeight*Math.random());
+    		list.add(x);
+    		list.add(y);
+    	}
+    	else if (side == 2) {
+    		x = 0;
+    		y = (int) (screenHeight*Math.random());
+    		list.add(x);
+    		list.add(y);
+    	}
+    	else if (side == 3) {
+    		y = 0;
+    		x = (int) (screenWidth*Math.random());
+    		list.add(x);
+    		list.add(y);
+    	}
+    	else if (side == 4) {
+    		y = screenHeight;
+    		x = (int) (screenWidth*Math.random());
+    		list.add(x);
+    		list.add(y);
+    	}
+    	
+    	return list;
+    	
+    }
     
     
     
