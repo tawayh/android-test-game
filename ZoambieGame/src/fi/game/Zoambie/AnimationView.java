@@ -42,7 +42,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		            	);
 		        }
 
-		        // Peli looppi
+		        // Pelilooppi
 		        @Override
 		        public void run() {
 		            while (running) {
@@ -114,7 +114,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		        	//rotate image, getXPos, getYPos are x & y coords of the image
 
 		        	Matrix newtest = new Matrix();
-		        	newtest.postRotate(-25);
+		        	newtest.postRotate((float) saw.getDirection());
 		        	Bitmap testi_bmp = Bitmap.createBitmap(saw.getBitmap(), 0, 0, saw.getBitmap().getWidth(), saw.getBitmap().getHeight(), newtest, true);
 		        	newtest.setTranslate(player.getX() + (player.getBitmap().getWidth() / 2), player.getY() + (player.getBitmap().getWidth() / 2));
 		        	//matrix.postRotate((float)saw.getDirection(), player.getX() - (saw.getBitmap().getWidth() / 2), (float)player.getY() - (saw.getBitmap().getWidth() / 2));
@@ -184,11 +184,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     		if (y > 240 && x < 240)	 {
     			//dpadX = x;
     			//dpadY = y;
-    			saw.updateDirection(x, y, 360, 120);
-    		}
-    		else {
-    			pressedX = x;
-    			pressedY = y;
+    			saw.updateDirection(x, y, 120, 360);
     		}
     	}
     	catch (Exception e) {
@@ -198,14 +194,12 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     }
     
     
-    
-    
     public void createZombie() {
 
     	//Nyt siis tulee sekunni välein mörköjä
     	if (System.currentTimeMillis() - lastMeasuredTime > 1000   &&  enemyList.size() < 500) {
 
-    		//ZOmbin random aloitus sijainti
+    		//Zombien spawnaus
 	    	Character enemy;
 	    	
 	    	List list = randomZombieLocation();
@@ -273,8 +267,6 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     	return list;
     	
     }
-    
-    
     
     public void addEnemy(Character c) {
     	enemyList.add(c);
