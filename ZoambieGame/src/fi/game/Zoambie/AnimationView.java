@@ -5,15 +5,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.LinkedList;
 
 class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     
@@ -22,9 +20,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 				private boolean running;
 		        private SurfaceHolder surfaceHolder;
 		        private Paint paint;
-		        
-		        
-		        
+
 		        // Konstruktori
 		        public AnimationThread(SurfaceHolder newSurfaceHolder) {
 		            surfaceHolder = newSurfaceHolder;
@@ -36,13 +32,14 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		            	400,
 		            	2
 		            );
-		            
+		            saw = new Saw(
+		            		BitmapFactory.decodeResource(getResources(), R.drawable.saw), 
+		            		player.getX(),
+		            		player.getY()
+		            	);
 		        }
-		        
-		        
+
 		        // Peli looppi
-		        // T‰‰ runko on just sellanen mit‰ n‰kee joka esimerkiss‰
-		        // En ymm‰rr‰ kunnol t‰t, mut se on tehokas ja toimii
 		        @Override
 		        public void run() {
 		            while (running) {
@@ -50,7 +47,6 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		                try {
 		                    canvas = surfaceHolder.lockCanvas(null);
 		                    synchronized (surfaceHolder) {
-		                    	removeKilledZombies();
 		                    	updatePhysics();
 		                        doDraw(canvas);
 		                    }
@@ -69,52 +65,64 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 			        player.updateMovement(pressedX, pressedY);
 			        
 			        if (enemyList.size() != 0) {
-
-			        	for (Iterator<Character> it = enemyList.iterator(); it.hasNext();) {
+			        	for (int i = 0; i < enemyList.size(); i++) {
 			        		try {
-			        			
-			        			
-				        		Character c = (Character) it.next();
-				        		
-				        		
+			        			Character c = enemyList.get(i);
+
 				        		//Jos zombi on 30 px p‰‰ss‰ playerista, zombi kuolee
 				        		if (c.getDistance() < 30) {
 				        			c.get_damage(200);
-				        			killedZombies.add(c);
-				        			//Character temp = c;
-				        			if (it.hasNext())
-				        				c = it.next();
-				        			
+				        			if (c.getHealth() <= 0) {
+				        				synchronized (surfaceHolder) {
+				        					enemyList.remove(c);
+				        					createZombie();
+				        				}
+				        			}
 				        		}
-				        		
 				        		c.updateMovement(player.getX(), player.getY());
 				        		c.updateDistance(player.getX(), player.getY());
-				        		
-				        		
 			        		}
 			        		catch (Exception e) {
 			        			System.out.println("SHIT");
+			        			setRunning(false);
 			        		}
 			        	}
 			        }
-			        
-		            
 		            createZombie();
-			            
-		            					
-		            
 		        }
 		        
 		        // Piirto-metodi
 		        private void doDraw(Canvas canvas) {
-		        	canvas.drawBitmap(background, 0, 0, null);	//Alustetaan piirt‰m‰ll‰ tausta
-		        	//TODO - tarviiko alla oleva painttia vai toimisiko nopeammin nullilla
-		        	canvas.drawBitmap(player.getBitmap(), player.getX(), player.getY(), paint);
-		        	//TODO piirr‰ kaikki enemyt listasta
-		        	for (Iterator<Character> it = enemyList.iterator(); it.hasNext();) {
-			        	Character c = (Character) it.next();
-			        	canvas.drawBitmap(c.getBitmap(), c.getX(), c.getY(), paint);
+		        	//Alustetaan pelipˆyt‰ piirt‰m‰ll‰ tausta
+		        	canvas.drawBitmap(background, 0, 0, null);	
+		        	//TODO - piirto metodissa paintissa null (kumpi parempi null/paint)
+		        	
+		        	//Piirret‰‰n pelaaja
+		        	canvas.drawBitmap(player.getBitmap(), player.getX(), player.getY(), null);
+		        	
+		        	//Piirret‰‰n moottorisaha
+		        	
+		        	Matrix matrix = new Matrix();
+
+		        	//move image
+
+		        	matrix.setTranslate(player.getX() - (saw.getBitmap().getWidth() / 2), player.getY() - (saw.getBitmap().getWidth() / 2));
+
+		        	//rotate image, getXPos, getYPos are x & y coords of the image
+
+		        	matrix.postRotate((float)saw.getDirection(), player.getX() - (saw.getBitmap().getWidth() / 2), (float)player.getY() - (saw.getBitmap().getWidth() / 2));
+		        	canvas.drawBitmap(saw.getBitmap(), matrix, paint);
+		        	
+		        	
+		        	
+		        	
+		        	//Piirret‰‰n zombit
+		        	Character c = null;
+		        	for (int i = 0; i < enemyList.size(); i++) {
+			        	c = (Character) enemyList.get(i);
+			        	canvas.drawBitmap(c.getBitmap(), c.getX(), c.getY(), null);
 		        	}
+		        	c = null;
 		        	canvas.restore();
 		        }
 		        
@@ -125,10 +133,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		        
 		    } // <---   AnimationThread luokka p‰‰ttyy
 			
-			
-			
-			
-			
+
 			
 			
 	public int screenWidth;
@@ -136,18 +141,20 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     private AnimationThread thread;
     private float pressedX;
     private float pressedY;
+    private float dpadX;
+    private float dpadY;
     //private float lastX;		//Jos ei olla tˆk‰tyy, niin ei liikuta
     //private float lastY;		//Sama juttu
     public Character player;
     public Bitmap background;
+    public Saw saw;
     //public Character enemy;
     //lastMeasuredTimell‰ lasketaan milloin zombeja luodaan
     long lastMeasuredTime = System.currentTimeMillis();;
     
     //TODO onko arraylist parhain, vai esim linkitettylista
-    ArrayList<Character> enemyList = new ArrayList<Character>();
-    //TODO killedZombie listasta pit‰‰ p‰‰st‰ eroon
-    ArrayList<Character> killedZombies = new ArrayList<Character>();
+    //ArrayList<Character> enemyList = new ArrayList<Character>();
+    LinkedList<Character> enemyList = new LinkedList<Character>();
     
     // Konstruktori miss‰ luodaan threadi
     public AnimationView(Context context, AttributeSet attrs) {
@@ -164,8 +171,17 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     public boolean onTouchEvent(MotionEvent event) {
     	boolean eventHandled = true;
     	try {
-    		pressedX = event.getX();
-    		pressedY = event.getY();
+    		float x = event.getX();
+    		float y = event.getY();
+    		if (y > 240 && x < 240)	 {
+    			//dpadX = x;
+    			//dpadY = y;
+    			saw.updateDirection(x, y, 360, 120);
+    		}
+    		else {
+    			pressedX = x;
+    			pressedY = y;
+    		}
     	}
     	catch (Exception e) {
     		eventHandled = false;
@@ -215,34 +231,12 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     	enemyList.add(c);
     }
     
-    public void addKill(Character c) {
-    	killedZombies.add(c);
-    }
-    
     public void removeEnemy(Character c) {
     	int i = enemyList.indexOf(c);
     	enemyList.remove(i);
     }
     
-    
-    // TODO t‰st‰ metodista pit‰is p‰‰st‰ eroon
-    public void removeKilledZombies() {
-    	for (Iterator<Character> it = killedZombies.iterator() ; it.hasNext();) {
-    		Character c = (Character)it.next();
-    		if (enemyList.contains(c)) {
-    			enemyList.remove(c);
-    			c = null;
-    			System.out.println("KILLED");
-    		}
-    	}
-    	killedZombies = null;
-    	killedZombies = new ArrayList<Character>();
-    }
-    
-    
     // Alla pakollisia metodeja kun implementoidaan SurfaceHolder
-    
-    
     
     // Callback invoked when the surface dimensions change.
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {

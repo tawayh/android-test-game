@@ -7,24 +7,18 @@ public class Saw {
 	private Bitmap bitmap;      // Hahmon kuva
 	private float x;			// X-sijainti
 	private float y;			// Y-sijainti
-	private double speed;		// Hahmon nopeus ??
 	//private Rect sourceRect;	// Animaatioissa tullaan tarvitsemaan
 	//private Rect destRect;	// Animaatioissa tullaan tarvitsemaan
 	private double direction;
-	private int health;
 	
-	private double distance;	// Zombin et‰isyys pelaajaan (vain zombeille)
+
 
 	
 	// Konstruktori
-	public Saw(Bitmap bitmap, int x, int y, double speed){
-		this.bitmap = bitmap;
+	public Saw(Bitmap saw, float x, float y){
+		this.bitmap = saw;
 		this.x = x;
 		this.y = y;
-		this.speed = speed;
-		this.health = 100;
-		this.distance = 100;	// debugging reasons
-								// Jos ei aseteta, niin zombit kuolevat heti luodessa
 	}		
 	
 
@@ -55,10 +49,6 @@ public class Saw {
 		this.y = y;
 	}
 	
-	public double getSpeed() {
-		return speed;
-	}
-	
 	public void setDirection(double direction) {
 		this.direction = direction;
 	}
@@ -67,62 +57,48 @@ public class Saw {
 		return this.direction;
 	}
 	
-	public double getDistance() {
-		return this.distance;
-	}
-	
-	public void setDistance(double distance) {
-		this.distance = distance;
-	}
-	
-	
-	public int getHealth() {
-		return health;
-	}
-
-
-	public void setHealth(int health) {
-		this.health = health;
-	}
-
-
-	// Metodi laskee suunnan ja nopeuden mukaan hahmolle x ja y koordinaatit
-	// Kulkee siis "suoraan" kohdetta p‰in
-	public void updateMovement(float x, float y) {
-		if (this.health > 0) {
-			double dy = (double) y - (double) this.y;
-			double dx = (double) x - (double) this.x;
-			
-			// Mul ei oo n‰ist mit‰‰n muistikuvaa, kopioin mun vanhast XNA pelist
-			setDirection( Math.atan2(dy, dx)  + (float)Math.PI );
-			setX((float) (this.x + (Math.cos(getDirection()) * -this.speed)) );
-			setY((float) (this.y + (Math.sin(getDirection()) * -this.speed)) );
-		}
-
-	}
-	
-	
-	
-	
-	public void get_damage(int dmg) {
-		this.health = health-dmg;
-		if(this.health<=0)
-			kill_char();
-	}
-
-	private void kill_char() {
-		//jotain
-	}
-	
-	
-	
-	public void updateDistance(float x, float y) {
-		float dx = x - this.x;
-		float dy = y - this.y;
+	public void updateDirection(float x1, float y1, float x2, float y2) {
+		float direction = 0;
+		//float direction = (centerX - centerY) / (touchX - touchY);
+		/*
+		 * if x2 = x1 then 
+        if y2 >= y1 then 
+            result 90 
+        elsif y2 < y1 then 
+            result 270 
+        end if 
+    else 
+        if x2 > x1 and y2 >= y1 then %QUAD 1 
+            result (arctand ((y2 - y1) / (x2 - x1))) 
+        elsif x2 > x1 and y2 < y1 then %QUAD 2 
+            result 360 + (arctand ((y2 - y1) / (x2 - x1))) 
+        elsif x2 < x1 and y2 < y1 then %QUAD 3 
+            result 180 + (arctand ((y2 - y1) / (x2 - x1))) 
+        elsif x2 < x1 and y2 >= y1 then %QUAD 4 
+            result 180 + (arctand ((y2 - y1) / (x2 - x1))) 
+        end if 
+		 */
+		/*
+		if (x2 > x1 && y2 >= y1)
+			direction = (float) Math.atan2((y2 - y1) / (x2 - x1));
+		else if (x2 > x1 && y2 < y1)
+			direction = (float) (360 + Math.atan2((y2 - y1) / (x2 - x1)));
+		else if (x2 < x1 && y2 < y1)
+			direction = (float) (180 + Math.atan2((y2 - y1) / (x2 - x1)));
+		else if (x2 < x1 && y2 >= y1)
+			direction = (float) (180 + Math.atan2((y2 - y1) / (x2 - x1)));
+		*/
+		//float y = y2 - y1;
+		//float x = x2 - x1;
+		//float radians = (float)Math.atan2(y, x);
+	    //float angle = radians * (float)(180/Math.PI);
 		
-		setDistance(   Math.sqrt( Math.pow(dx, 2) + Math.pow(dy, 2) )   );
+		//float direction = (float) Math.atan((touchY-centerY)/(touchX-centerX))*(float)(180/Math.PI);
+		//x1 - y1
+		//x2 - y2
+		direction = (float) Math.toDegrees( Math.atan2(y2-y1, x2-x1) );
+		
+		this.direction = direction + 90;
 		
 	}
-	
-	
 }
