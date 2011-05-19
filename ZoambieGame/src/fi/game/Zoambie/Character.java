@@ -12,7 +12,8 @@ public class Character {
 	//private Rect destRect;	// Animaatioissa tullaan tarvitsemaan
 	private double direction;
 	private int health;
-	
+	private int height;
+	private int width;
 	private double distance;	// Zombin et‰isyys pelaajaan (vain zombeille)
 
 	
@@ -28,15 +29,32 @@ public class Character {
 	}		
 	
 
-	//Getterit ja setterit alempana
 
 	
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
 	public Bitmap getBitmap() {
 		return this.bitmap;
 	}
 
 	public void setBitmap(Bitmap bitmap) {
 		this.bitmap = bitmap;
+		this.height = bitmap.getHeight();
+		this.width = bitmap.getWidth();
 	}
 
 	public float getX() {
@@ -86,15 +104,20 @@ public class Character {
 	}
 
 
-	// Metodi laskee suunnan ja nopeuden mukaan hahmolle x ja y koordinaatit
-	// Kulkee siis "suoraan" kohdetta p‰in
-	public void updateMovement(float x, float y) {
+	public void updateMovement(double x, double y) {
 		if (this.health > 0) {
-			double dy = (double) y - (double) this.y;
-			double dx = (double) x - (double) this.x;
+			//pelaaja liikutetaan -1 arvoilla
+			//Suunta on valmiiksi laskettu SensorEventiss‰
+			if (x != -1 && y != -1) {
+				
+				//sekoitetaan pakkaa, jotta zombin liike on sekavempaa
+				y = y - (Math.random()*100) + (Math.random()*100);
+				x = x - (Math.random()*100) + (Math.random()*100);
+				double dy = (double) y - (double) this.y;
+				double dx = (double) x - (double) this.x;
 			
-			// Mul ei oo n‰ist mit‰‰n muistikuvaa, kopioin mun vanhast XNA pelist
-			setDirection( Math.atan2(dy, dx)  + (float)Math.PI );
+				setDirection( Math.atan2(dy, dx)  + (float)Math.PI );
+			}
 			setX((float) (this.x + (Math.cos(getDirection()) * -this.speed)) );
 			setY((float) (this.y + (Math.sin(getDirection()) * -this.speed)) );
 		}
@@ -104,6 +127,13 @@ public class Character {
 	
 	
 	
+	public void setSpeed(double speed) {
+		this.speed = speed;
+	}
+
+
+
+
 	public void get_damage(int dmg) {
 		this.health = health-dmg;
 		if(this.health<=0)

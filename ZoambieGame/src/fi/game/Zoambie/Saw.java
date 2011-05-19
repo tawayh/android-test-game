@@ -3,47 +3,48 @@ package fi.game.Zoambie;
 import android.graphics.*;
 
 public class Saw {
-	
-	private Bitmap bitmap;      // Hahmon kuva
-	private float x;			// X-sijainti
-	private float y;			// Y-sijainti
-	//private Rect sourceRect;	// Animaatioissa tullaan tarvitsemaan
-	//private Rect destRect;	// Animaatioissa tullaan tarvitsemaan
-	private double direction;
-	
+        
+        private Bitmap bitmap;      // Hahmon kuva
+        private float x;            // X-sijainti
+        private float y;            // Y-sijainti
+        //private Rect sourceRect;  // Animaatioissa tullaan tarvitsemaan
+        //private Rect destRect;    // Animaatioissa tullaan tarvitsemaan
+        private double direction;
+        
 
 
-	
-	// Konstruktori
-	public Saw(Bitmap saw, float x, float y){
-		this.bitmap = saw;
-		this.x = x;
-		this.y = y;
-	}		
-	
+        
+        // Konstruktori
+        public Saw(Bitmap saw, float x, float y){
+                this.bitmap = saw;
+                this.x = x;
+                this.y = y;
+        }               
+        
 
-	//Getterit ja setterit alempana
+        //Getterit ja setterit alempana
 
-	
-	public Bitmap getBitmap() {
-		return this.bitmap;
-	}
+        
+        public Bitmap getBitmap() {
+                return this.bitmap;
+        }
 
-	public void setBitmap(Bitmap bitmap) {
-		this.bitmap = bitmap;
-	}
+        public void setBitmap(Bitmap bitmap) {
+                this.bitmap = bitmap;
+        }
 
-	public float getX() {
-		return x;
-	}
+        public float getX() {
+                return x;
+        }
 
-	public void setX(float x) {
-		this.x = x;
-	}
+        public void setX(float x) {
+                this.x = x;
+        }
 
-	public float getY() {
-		return y;
-	}
+        public float getY() {
+                return y;
+        }
+
 
 	public void setY(float y) {
 		this.y = y;

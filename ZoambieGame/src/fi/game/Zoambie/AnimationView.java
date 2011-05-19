@@ -7,6 +7,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -61,11 +65,22 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		            }
 		        }
 	        
-		        // T‰‰ nyt oli monessa esimerkiss‰ mukana
-		        // En tii‰ onko pakollinen
-		        // T‰t‰ vois k‰ytt‰‰ collisionDetectioniin
 		        private void updatePhysics() {
-			        player.updateMovement(pressedX, pressedY);
+			        player.updateMovement(-1, -1);
+			        
+			        //Varmistukset ettei pelaaja mene ruudun ulkopuolelle
+			        if (player.getX() < 0) {
+			        	player.setX(0);
+			        }
+			        else if (player.getX()+player.getWidth() > screenWidth) {
+			        	player.setX(screenWidth-player.getWidth());
+			        }
+			        if (player.getY() < 0) {
+			        	player.setY(0);
+			        }
+			        else if (player.getY()+player.getHeight() > screenHeight) {
+			        	player.setY(screenHeight-player.getHeight());
+			        }
 			        
 			        if (enemyList.size() != 0) {
 			        	for (int i = 0; i < enemyList.size(); i++) {
@@ -96,29 +111,15 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		        
 		        // Piirto-metodi
 		        private void doDraw(Canvas canvas) {
-		        	//Alustetaan pelipˆyt‰ piirt‰m‰ll‰ tausta
 		        	canvas.drawBitmap(background, 0, 0, null);	
-		        	//TODO - piirto metodissa paintissa null (kumpi parempi null/paint)
-		        	
-		        	//Piirret‰‰n pelaaja
 		        	canvas.drawBitmap(player.getBitmap(), player.getX(), player.getY(), null);
 		        	
 		        	//Piirret‰‰n moottorisaha
-		        	
-		        	Matrix matrix = new Matrix();
-
-		        	//move image
-
-		        	//matrix.setTranslate(player.getX() + (player.getBitmap().getWidth() / 2), player.getY() + (player.getBitmap().getWidth() / 2));
-
-		        	//rotate image, getXPos, getYPos are x & y coords of the image
-
+		        	//Edelleenk‰‰n ei skulaa, setRotaten pivotit pit‰is saada kuntoon tjs.
 		        	Matrix newtest = new Matrix();
-		        	newtest.postRotate((float) saw.getDirection());
+		        	newtest.setRotate((float)saw.getDirection(), (float)25, (float)20);
 		        	Bitmap testi_bmp = Bitmap.createBitmap(saw.getBitmap(), 0, 0, saw.getBitmap().getWidth(), saw.getBitmap().getHeight(), newtest, true);
-		        	newtest.setTranslate(player.getX() + (player.getBitmap().getWidth() / 2), player.getY() + (player.getBitmap().getWidth() / 2));
-		        	//matrix.postRotate((float)saw.getDirection(), player.getX() - (saw.getBitmap().getWidth() / 2), (float)player.getY() - (saw.getBitmap().getWidth() / 2));
-		        	//canvas.drawBitmap(saw.getBitmap(), matrix, paint);
+		        	newtest.setTranslate(player.getX()+(player.getWidth()/2), player.getY()+(player.getHeight()/2));
 		        	canvas.drawBitmap(testi_bmp, newtest, paint);
 		        	
 		        	
@@ -131,6 +132,8 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 			        	canvas.drawBitmap(c.getBitmap(), c.getX(), c.getY(), null);
 		        	}
 		        	c = null;
+		        	
+		        	
 		        	canvas.restore();
 		        }
 		        
@@ -143,34 +146,79 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 			
 
 			
-			
+	public SensorManager sensorManager;
 	public int screenWidth;
 	public int screenHeight;
     private AnimationThread thread;
-    private float pressedX;
-    private float pressedY;
-    private float dpadX;
-    private float dpadY;
-    //private float lastX;		//Jos ei olla tˆk‰tyy, niin ei liikuta
-    //private float lastY;		//Sama juttu
     public Character player;
     public Bitmap background;
     public Saw saw;
-    //public Character enemy;
-    //lastMeasuredTimell‰ lasketaan milloin zombeja luodaan
     long lastMeasuredTime = System.currentTimeMillis();;
-    
-    //TODO onko arraylist parhain, vai esim linkitettylista
-    //ArrayList<Character> enemyList = new ArrayList<Character>();
     LinkedList<Character> enemyList = new LinkedList<Character>();
+    private final SensorEventListener orientationSensorEventListener = new SensorEventListener() {
+		public void onSensorChanged(SensorEvent event) {
+            updateOrientation(//event.values[0],
+                              event.values[1],
+                              event.values[2]
+                              //true
+                              );
+		}
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+    };
     
-    // Konstruktori miss‰ luodaan threadi
+    
+    
+    // Konstruktori miss‰ luodaan threadi ja listataan sensorit
     public AnimationView(Context context, AttributeSet attrs) {
         super(context, attrs);
         SurfaceHolder holder = getHolder();
         holder.addCallback(this);
         thread = new AnimationThread(holder); //Threadi luodaan, k‰ynnistyy surfaceCreated()
+    
+    
+        sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
+
+        
+        List<Sensor> sensorList;
+        sensorList = sensorManager.getSensorList(Sensor.TYPE_ORIENTATION);
+        try {
+        	sensorManager.registerListener(orientationSensorEventListener, sensorList.get(0), SensorManager.SENSOR_DELAY_GAME);
+        } catch(IndexOutOfBoundsException e) {
+        	//Tarvitaan try-catch emulaattorilla ajamista varten
+        }
     }
+    
+    
+    
+    
+    
+	private void updateOrientation( float pitch, float roll ) {
+		double direction;
+		double speed = 0;
+		
+		double dy = (double) 0 - (double) roll;
+		double dx = (double) 0 - (double) pitch;
+		
+		direction = ( Math.atan2(-dy, dx)  + (float)Math.PI );
+		if (roll < 0) 
+			speed += -roll; 
+		else
+			speed += roll;
+		if (pitch < 0)
+			speed += -pitch;
+		else
+			speed += pitch;
+		
+		//Alempi arvo on saatu kokeilun kautta, se on hyv‰
+		speed = speed / 10;
+		
+		if (speed > 2)
+			speed = 2;
+		
+		player.setDirection(direction);
+		player.setSpeed(speed);
+	}
     
     
     
@@ -202,26 +250,30 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     		//Zombien spawnaus
 	    	Character enemy;
 	    	
-	    	List list = randomZombieLocation();
-	    	double x = (Double) list.get(0);
-	    	double y = (Double) list.get(1);
+	    	List<Integer> list = randomZombieLocation();
+	    	int x = (int) list.get(0);
+	    	int y = (int) list.get(1);
+	    	
+	    	double speed = 0.3 * Math.random();
+	    	if (speed < 0.05)
+	    		speed = 0.05;
 	    	
 	    	enemy = new Character( 
 		            BitmapFactory.decodeResource(getResources(), R.drawable.enemy),
-		            (int)x,
-		            (int)y,
-		            0.25
+		            x,
+		            y,
+		            speed
 		    );
 	    	addEnemy(enemy);
 	    	lastMeasuredTime = System.currentTimeMillis();
     	}
     }
     
-    public List randomZombieLocation() {
-    	List list = new ArrayList();
+    public List<Integer> randomZombieLocation() {
+    	List<Integer> list = new ArrayList<Integer>();
     	int side = 0;
-    	double x = 0;
-    	double y = 0;
+    	int x = 0;
+    	int y = 0;
     	
     	//Randomly choose the side of the screen where the zombie is going to spawn
     	double random = Math.random();
@@ -276,6 +328,10 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     	int i = enemyList.indexOf(c);
     	enemyList.remove(i);
     }
+    
+    
+    
+    
     
     // Alla pakollisia metodeja kun implementoidaan SurfaceHolder
     
