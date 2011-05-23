@@ -3,30 +3,21 @@
 = todo =
 
   * moottorisaha
-    * ~~virtual d-pad~~
-    * ~~moottorisahan asento d-padista~~
-    * ~~moottorisaha luokka kuntoon~~
     * damage (collision detect)
-    * ~~sijainti aina keskelle pelaajaa~~
     * rotaten ja sijainnin hiominen
-  * zombit
-    * ~~random sijainti algoritmi paremmaksi~~
+  * zombit / pelaaja / character luokka
     * damagen ottaminen ja antaminen
-    * ~~killed zombies listasta eroon~~
-    * ~~pitäisikö zombies arraylist vaihtaa johonkin toiseen~~
     * zombeja syntyy kiihtyvään tahtiin
-  * pelaaja
-    * ~~omaan luokkaan?~~
-    * ~~liikkuminen orientaation mukaan~~
+    * jokin tyyppi muuttuja, jota erilaisia zombeja voi luoda
   * grafiikat
     * animaatiot, mitä kaikkea tarvitsee
     * stuude piirtää graffat
-  * PowerUpit ja erikoisuudet
-    * miinat?
+  * Powerupit ja erikoisuudet
+    * miinat
     * erilaisia zombeja
   * muuta
     * collision detect, miten tehdään
-    * menu (oma activity ja viewi
+    * menu (oma activity ja view)
 
 
 =done=
@@ -34,4 +25,17 @@
     * arraylist vaihdettu linkedlistiin
     * killedzombies lista poistettu
     * zombi listaa käsitellään synkronoidusti, ettei kaksi threadia muokkaa sitä samaan aikaan
+    * random sijainti algoritmi paremmaksi
+    * killed zombies listasta eroon
+    * pitäisikö zombies arraylist vaihtaa johonkin toiseen
+
+  * pelaaja
+    * omaan luokkaan?
+    * liikkuminen orientaation mukaan
+
+  * moottorisaha
+    * virtual d-pad
+    * moottorisahan asento d-padista
+    * moottorisaha luokka kuntoon
+    * sijainti aina keskelle pelaajaa
  
