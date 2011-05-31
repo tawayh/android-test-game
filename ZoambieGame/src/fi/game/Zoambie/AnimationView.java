@@ -289,7 +289,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     public void createZombie() {
 
     	//Zombeja syntyy kiihtyvästi zombieSpawn numeron mukaan
-    	if (System.currentTimeMillis() - lastMeasuredTime > zombieSpawn   &&  enemyList.size() < 1000) {
+    	if (System.currentTimeMillis() - lastMeasuredTime > zombieSpawn   &&  enemyList.size() < 250) {
     		//Zombien spawnaus
 	    	Character enemy;
 	    	
@@ -311,7 +311,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 	    	addEnemy(enemy);
 	    	lastMeasuredTime = System.currentTimeMillis();
 	    	if (zombieSpawn > 100)
-	    		zombieSpawn = zombieSpawn - 100;
+	    		zombieSpawn = zombieSpawn - 10;
 	    	else if (zombieSpawn < 100 && zombieSpawn > 10)
 	    		zombieSpawn = zombieSpawn - 10;
     	}
