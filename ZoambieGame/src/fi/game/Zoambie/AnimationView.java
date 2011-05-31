@@ -173,7 +173,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		        	canvas.drawPosText(""+killedZombies, pos, p);
 		        	
 		        	//Zombien m‰‰r‰ kent‰ll‰
-		        	float [] pos2 = {700,50,700,50,700,50,700,50};
+		        	float [] pos2 = {700,50,710,50,720,50,730,50};
 		        	canvas.drawPosText(""+enemyList.size(), pos2, p);
 		        	
 		        	canvas.restore();
