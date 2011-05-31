@@ -2,25 +2,30 @@
 
 = todo =
 
-  * moottorisaha
-    * damage (collision detect)
-    * rotaten ja sijainnin hiominen
+  * grafiikat
+    * animaatiot, mitä kaikkea tarvitsee
+    * kuolinspritet
+    * stuude piirtää graffat
+
+  * Powerupit ja erikoisuudet
+    * miinat
+    * erilaisia zombeja
+
+  * muuta
+    * toinen Dpad ja optioni ottaa orientaatio pois?
+    * menu (oma activity ja view)
+    * koodin refaktorointi
+
+
+=done=
+
   * zombit / pelaaja / character luokka
     * damagen ottaminen ja antaminen
     * zombeja syntyy kiihtyvään tahtiin
     * jokin tyyppi muuttuja, jota erilaisia zombeja voi luoda
-  * grafiikat
-    * animaatiot, mitä kaikkea tarvitsee
-    * stuude piirtää graffat
-  * Powerupit ja erikoisuudet
-    * miinat
-    * erilaisia zombeja
-  * muuta
-    * collision detect, miten tehdään
-    * menu (oma activity ja view)
-
-
-=done=
+  * moottorisaha
+    * damage (collision detect)
+    * rotaten ja sijainnin hiominen
   * zombit
     * arraylist vaihdettu linkedlistiin
     * killedzombies lista poistettu
@@ -32,6 +37,9 @@
   * pelaaja
     * omaan luokkaan?
     * liikkuminen orientaation mukaan
+
+  * Muuta
+    * collision detect, miten tehdään
 
   * moottorisaha
     * virtual d-pad
