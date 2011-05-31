@@ -112,9 +112,6 @@ public class Character {
 			//Suunta on valmiiksi laskettu SensorEventissä
 			if (x != -1 && y != -1) {
 				
-				//sekoitetaan pakkaa, jotta zombin liike on sekavempaa
-				y = y - (Math.random()*100) + (Math.random()*100);
-				x = x - (Math.random()*100) + (Math.random()*100);
 				double dy = (double) y - (double) this.y;
 				double dx = (double) x - (double) this.x;
 			
@@ -185,7 +182,7 @@ public class Character {
 		
 		if ((x < 30 && x > -30)  &&  (y < 30 && y > -30)) {
 			collision = true;
-			/*
+			
 			if (getX() >= player.getX()){
 				if (getY() >= player.getY()) {
 					if (getX() <= player.getX()+player.getWidth()  &&  getY() <= player.getY()+player.getHeight()) {
@@ -214,7 +211,7 @@ public class Character {
 					}
 				}
 			}
-			*/
+			
 		}
 		return collision;
 	}
@@ -223,55 +220,58 @@ public class Character {
 		
 		boolean collision = false;
 		
-		float x = getX() - saw.getKillPoint().x;
-		float y = getY() - saw.getKillPoint().y;
+		float x = (getX()+(getWidth()/2)) - saw.getKillPoint().x;
+		float y = (getY()+(getHeight()/2)) - saw.getKillPoint().y;
 		
-		if ((x < 5 && x > -5)  &&  (y < 5 && y > -5)) {
+		float xx = saw.getKillPoint().x;
+		float yy = saw.getKillPoint().y;
+		
+		if ((x < 30 && x > -30)  &&  (y < 30 && y > -30)) {
 			
-			collision = true;
-			//get_damage(5);
-			setX((float) (this.x + (Math.cos(getDirection()) * (10) )));
-			setY((float) (this.y + (Math.sin(getDirection()) * (10) )));
+			//collision = true;
+			//get_damage(1);
+			//setX((float) (this.x + (Math.cos(getDirection()) * (10) )));
+			//setY((float) (this.y + (Math.sin(getDirection()) * (10) )));
 			
-			/*
-			if (getX() >= saw.getX()){
+			
+			if (getX() >= xx){
 				if (getY() >= saw.getY()) {
-					if (getX() <= saw.getX()+saw.getWidth()  &&  getY() <= saw.getY()+saw.getHeight()) {
+					if (getX() <= xx  &&  getY() <= yy) {
 						collision = true;
-						//get_damage(5);
+						get_damage(1);
 						setX((float) (this.x + (Math.cos(getDirection()) * (this.speed))*10) );
 						setY((float) (this.y + (Math.sin(getDirection()) * (this.speed))*10) );
 						
 					}
 				}
 				else {
-					if (getX() <= saw.getX()+saw.getWidth()  &&  getY() + getHeight()  >= saw.getY()) {
+					if (getX() <= xx  &&  getY() + getHeight()  >= yy) {
 						collision = true;
-						//get_damage(5);
+						get_damage(1);
 						setX((float) (this.x + (Math.cos(getDirection()) * (this.speed))*10) );
 						setY((float) (this.y + (Math.sin(getDirection()) * (this.speed))*10) );
 					}
 				}
 			}
 			else {
-				if (getY() >= saw.getY()) {
-					if (getX() + getWidth() >= saw.getX()   &&  getY() <= saw.getY()+saw.getHeight()) {
+				if (getY() >= yy) {
+					if (getX() + getWidth() >= xx   &&  getY() <= yy) {
 						collision = true;
-						//get_damage(5);
+						get_damage(1);
 						setX((float) (this.x + (Math.cos(getDirection()) * (this.speed))*10) );
 						setY((float) (this.y + (Math.sin(getDirection()) * (this.speed))*10) );
 					}
 				}
 				else {
-					if (getX() + getWidth() >= saw.getX()   &&  getY() + getHeight()  >= saw.getY()) {
+					if (getX() + getWidth() >= xx   &&  getY() + getHeight()  >= yy) {
 						collision = true;
-						//get_damage(5);
+						get_damage(1);
 						setX((float) (this.x + (Math.cos(getDirection()) * (this.speed))*10) );
 						setY((float) (this.y + (Math.sin(getDirection()) * (this.speed))*10) );
 					}
 				}
 			}
-			*/
+			
 		}
 		return collision;
 	}

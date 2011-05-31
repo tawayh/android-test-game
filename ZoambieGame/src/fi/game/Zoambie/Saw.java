@@ -23,6 +23,7 @@ public class Saw {
                 this.y = y;
                 this.width = saw.getWidth();
                 this.height = saw.getHeight();
+                this.killPoint = new Point(0, 0);
         }     
         
 
@@ -67,15 +68,17 @@ public class Saw {
         }
 
         
-        public void setKillPoint() {
-        	Point p = new Point();
-        	int x = 0;
-        	int y = 0;
-        	//x = ((int) (getX() + (Math.cos(getDirection()) * 50)) );
-			//y = ((int) (getY() + (Math.sin(-getDirection()) * 50)) );
-			x = 100;
-			y = 100;
-        	p.set(x, y);
+        public void setKillPoint(float x, float y) {
+        	
+        	double xx = (double)x;
+        	double yy = (double)y;
+        	//int x = ((int) (getX() + (Math.cos(asd ) *20 ) ) );
+			//int y = ((int) (getY() + (Math.sin(asd ) *20) ) );
+        	
+        	xx = xx + (Math.cos(Math.toRadians(getDirection())) * -40);
+        	yy = yy + (Math.sin(Math.toRadians(getDirection())) * -40);
+        	
+        	this.killPoint.set((int)xx, (int)yy);
 			
         }
         public Point getKillPoint() {
@@ -96,7 +99,9 @@ public class Saw {
 	
 	public void updateDirection(float x1, float y1, float x2, float y2) {
 		float direction = 0;
+		
 		direction = (float) Math.toDegrees( Math.atan2(y2-y1, x2-x1) );
+		//setKillPoint(Math.atan2(-y2-y1, x2-x1)  + (float)Math.PI );
 		
 		this.direction = direction;
 		

@@ -41,7 +41,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		            	200,
 		            	400,
 		            	2,
-		            	1000
+		            	200
 		            );
 		            saw = new Saw(
 		            		BitmapFactory.decodeResource(getResources(), R.drawable.saw), 
@@ -72,7 +72,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		        private void updatePhysics() {
 			        player.updateMovement(-1, -1);
 			        player.checkCorners(screenWidth, screenHeight);
-			        
+			        saw.setKillPoint(player.getX()+ (player.getWidth()/2) , player.getY() + (player.getHeight()/2));
 			        
 			        if (enemyList.size() != 0) {
 			        	for (int i = 0; i < enemyList.size(); i++) {
@@ -81,9 +81,9 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 
 				        		c.updateMovement(player.getX(), player.getY());
 				        		if (c.collisionPlayer(player)) {
-				        			player.get_damage(5);
-				        			player.setX((float) (player.getX() + (Math.cos(c.getDirection()) * (10))) );
-				        			player.setY((float) (player.getY() + (Math.sin(c.getDirection()) * (10))) );
+				        			player.get_damage(1);
+				        			player.setX((float) (player.getX() + (Math.cos(c.getDirection()) * (-10))) );
+				        			player.setY((float) (player.getY() + (Math.sin(c.getDirection()) * (-10))) );
 				        			ColorMatrix cm = new ColorMatrix();
 						        	cm.setScale (5f, 0f, 0f, 0f);
 						        	ColorMatrixColorFilter cmcf = new ColorMatrixColorFilter(cm);
@@ -99,6 +99,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 				        			synchronized (surfaceHolder) {
 				        				enemyList.remove(c);
 				        				createZombie();
+				        				killedZombies ++;
 				        			}
 				        		}
 			        		}
@@ -134,9 +135,10 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		        	m.setRotate((float)saw.getDirection(), 50f, 20f);
 		        	m.postTranslate(player.getX()-30, player.getY()+5);
 		        	canvas.drawBitmap(bmp, m, paint);
+		        	
 		        	saw.setX(player.getX()-30);
 		        	saw.setY(player.getY()+5);
-		        	saw.setKillPoint();
+		        	
 		        	
 		        	//Piirretään D-Padin rajat ja healtit
 		        	Paint p = new Paint();
@@ -147,14 +149,32 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		        	
 		        	p.setColor(Color.GREEN);
 		        	p.setStrokeWidth(10f);
-		        	canvas.drawLine(20, 25, screenWidth*(player.getHealth()/1000)-20, 25, p);
+		        	p.setAlpha(100);
+		        	canvas.drawLine(20, 25, (screenWidth*((float)player.getHealth()/200f))-20, 25, p);
 		        	
-		        	try {
-		        	p.setColor(Color.RED);
-		        	p.setStrokeWidth(5f);
-		        	canvas.drawCircle(saw.getKillPoint().x, saw.getKillPoint().y, 5f, p);
-		        	}catch (Exception e) {}
 		        	
+		        	if (player.getHealth() <= 0) {
+		        		canvas.drawColor(Color.RED);
+		        		p.setColor(Color.BLACK);
+		        		p.setTextSize(75);
+		        		float[] pos = {50,300,  125,300,  200,300,  275,300,  350,300,  425,300,  500,300,  575,300,  650,300};
+			        	canvas.drawPosText("GAME OVER", pos, p);
+		        	
+		        	}
+		        	
+		        	
+		        	p.setColor(Color.WHITE);
+		        	p.setStrokeWidth(10f);
+		        	p.setTextSize(20);
+		        	p.setTextScaleX(1.2f);
+		        
+		        	//Tapetut zombiet
+		        	float[] pos = {50,50,60,50,70,50,80,50};
+		        	canvas.drawPosText(""+killedZombies, pos, p);
+		        	
+		        	//Zombien määrä kentällä
+		        	float [] pos2 = {700,50,700,50,700,50,700,50};
+		        	canvas.drawPosText(""+enemyList.size(), pos2, p);
 		        	
 		        	canvas.restore();
 		        }
@@ -168,6 +188,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 			
 
 	public int zombieSpawn = 2000;
+	public int killedZombies = 0;
 	public SensorManager sensorManager;
 	public int screenWidth;
 	public int screenHeight;
@@ -268,7 +289,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     public void createZombie() {
 
     	//Zombeja syntyy kiihtyvästi zombieSpawn numeron mukaan
-    	if (System.currentTimeMillis() - lastMeasuredTime > zombieSpawn   &&  enemyList.size() < 200) {
+    	if (System.currentTimeMillis() - lastMeasuredTime > zombieSpawn   &&  enemyList.size() < 1000) {
     		//Zombien spawnaus
 	    	Character enemy;
 	    	
