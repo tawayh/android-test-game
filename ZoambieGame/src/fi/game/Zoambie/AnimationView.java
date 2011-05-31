@@ -5,8 +5,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -16,7 +20,6 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,7 +40,8 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		            	BitmapFactory.decodeResource(getResources(), R.drawable.player),
 		            	200,
 		            	400,
-		            	2
+		            	2,
+		            	1000
 		            );
 		            saw = new Saw(
 		            		BitmapFactory.decodeResource(getResources(), R.drawable.saw), 
@@ -67,42 +71,40 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 	        
 		        private void updatePhysics() {
 			        player.updateMovement(-1, -1);
+			        player.checkCorners(screenWidth, screenHeight);
 			        
-			        //Varmistukset ettei pelaaja mene ruudun ulkopuolelle
-			        if (player.getX() < 0) {
-			        	player.setX(0);
-			        }
-			        else if (player.getX()+player.getWidth() > screenWidth) {
-			        	player.setX(screenWidth-player.getWidth());
-			        }
-			        if (player.getY() < 0) {
-			        	player.setY(0);
-			        }
-			        else if (player.getY()+player.getHeight() > screenHeight) {
-			        	player.setY(screenHeight-player.getHeight());
-			        }
 			        
 			        if (enemyList.size() != 0) {
 			        	for (int i = 0; i < enemyList.size(); i++) {
 			        		try {
 			        			Character c = enemyList.get(i);
 
-				        		//Jos zombi on 30 px päässä playerista, zombi kuolee
-				        		if (c.getDistance() < 30) {
-				        			c.get_damage(200);
-				        			if (c.getHealth() <= 0) {
-				        				synchronized (surfaceHolder) {
-				        					enemyList.remove(c);
-				        					createZombie();
-				        				}
+				        		c.updateMovement(player.getX(), player.getY());
+				        		if (c.collisionPlayer(player)) {
+				        			player.get_damage(5);
+				        			player.setX((float) (player.getX() + (Math.cos(c.getDirection()) * (10))) );
+				        			player.setY((float) (player.getY() + (Math.sin(c.getDirection()) * (10))) );
+				        			ColorMatrix cm = new ColorMatrix();
+						        	cm.setScale (5f, 0f, 0f, 0f);
+						        	ColorMatrixColorFilter cmcf = new ColorMatrixColorFilter(cm);
+						        	paint.setColorFilter(cmcf);
+				        		}
+				        		else {
+				        			paint = new Paint();
+				        		}
+				        		if (c.collisionSaw(saw))
+				        			c.get_damage(5);
+
+				        		if (c.getHealth() <= 0) {
+				        			synchronized (surfaceHolder) {
+				        				enemyList.remove(c);
+				        				createZombie();
 				        			}
 				        		}
-				        		c.updateMovement(player.getX(), player.getY());
-				        		c.updateDistance(player.getX(), player.getY());
 			        		}
 			        		catch (Exception e) {
 			        			System.out.println("SHIT");
-			        			setRunning(false);
+			        			//setRunning(false);
 			        		}
 			        	}
 			        }
@@ -111,27 +113,47 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		        
 		        // Piirto-metodi
 		        private void doDraw(Canvas canvas) {
-		        	canvas.drawBitmap(background, 0, 0, null);	
-		        	canvas.drawBitmap(player.getBitmap(), player.getX(), player.getY(), null);
-		        	
-		        	//Piirretään moottorisaha
-		        	//Edelleenkään ei skulaa, setRotaten pivotit pitäis saada kuntoon tjs.
-		        	Matrix newtest = new Matrix();
-		        	newtest.setRotate((float)saw.getDirection(), (float)25, (float)20);
-		        	Bitmap testi_bmp = Bitmap.createBitmap(saw.getBitmap(), 0, 0, saw.getBitmap().getWidth(), saw.getBitmap().getHeight(), newtest, true);
-		        	newtest.setTranslate(player.getX()+(player.getWidth()/2), player.getY()+(player.getHeight()/2));
-		        	canvas.drawBitmap(testi_bmp, newtest, paint);
-		        	
-		        	
-		        	
+		        	canvas.drawBitmap(background, 0, 0, paint);	
+
+		        	//Piirretään pelaaja
+		        	canvas.drawBitmap(player.getBitmap(), player.getX(), player.getY(), paint);
 		        	
 		        	//Piirretään zombit
 		        	Character c = null;
 		        	for (int i = 0; i < enemyList.size(); i++) {
 			        	c = (Character) enemyList.get(i);
-			        	canvas.drawBitmap(c.getBitmap(), c.getX(), c.getY(), null);
+			        	canvas.drawBitmap(c.getBitmap(), c.getX(), c.getY(), paint);
 		        	}
 		        	c = null;
+		        	
+		        	
+		        	//Piirretään moottorisaha
+		        	Matrix m = new Matrix();
+		        	Bitmap bmp = Bitmap.createBitmap(saw.getBitmap(), 0, 0, saw.getWidth(), saw.getHeight());
+		        	m.reset();
+		        	m.setRotate((float)saw.getDirection(), 50f, 20f);
+		        	m.postTranslate(player.getX()-30, player.getY()+5);
+		        	canvas.drawBitmap(bmp, m, paint);
+		        	saw.setX(player.getX()-30);
+		        	saw.setY(player.getY()+5);
+		        	saw.setKillPoint();
+		        	
+		        	//Piirretään D-Padin rajat ja healtit
+		        	Paint p = new Paint();
+		        	p.setColor(Color.BLACK);
+		        	p.setStrokeWidth(2f);
+		        	canvas.drawLine(0, screenHeight/2, screenHeight/2, screenHeight/2, p);
+		        	canvas.drawLine(screenHeight/2, screenHeight/2, screenHeight/2, screenHeight, p);
+		        	
+		        	p.setColor(Color.GREEN);
+		        	p.setStrokeWidth(10f);
+		        	canvas.drawLine(20, 25, screenWidth*(player.getHealth()/1000)-20, 25, p);
+		        	
+		        	try {
+		        	p.setColor(Color.RED);
+		        	p.setStrokeWidth(5f);
+		        	canvas.drawCircle(saw.getKillPoint().x, saw.getKillPoint().y, 5f, p);
+		        	}catch (Exception e) {}
 		        	
 		        	
 		        	canvas.restore();
@@ -145,7 +167,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		    } // <---   AnimationThread luokka päättyy
 			
 
-			
+	public int zombieSpawn = 2000;
 	public SensorManager sensorManager;
 	public int screenWidth;
 	public int screenHeight;
@@ -211,6 +233,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 			speed += pitch;
 		
 		//Alempi arvo on saatu kokeilun kautta, se on hyvä
+		//Saadaan sopiva kallistelu herkkyys
 		speed = speed / 10;
 		
 		if (speed > 2)
@@ -229,10 +252,10 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     	try {
     		float x = event.getX();
     		float y = event.getY();
-    		if (y > 240 && x < 240)	 {
+    		if (y > screenHeight/2 && x < screenHeight/2)	 {
     			//dpadX = x;
     			//dpadY = y;
-    			saw.updateDirection(x, y, 120, 360);
+    			saw.updateDirection(x, y, screenHeight/4, (screenHeight/2 + screenHeight/4));
     		}
     	}
     	catch (Exception e) {
@@ -244,15 +267,14 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     
     public void createZombie() {
 
-    	//Nyt siis tulee sekunni välein mörköjä
-    	if (System.currentTimeMillis() - lastMeasuredTime > 1000   &&  enemyList.size() < 500) {
-
+    	//Zombeja syntyy kiihtyvästi zombieSpawn numeron mukaan
+    	if (System.currentTimeMillis() - lastMeasuredTime > zombieSpawn   &&  enemyList.size() < 200) {
     		//Zombien spawnaus
 	    	Character enemy;
 	    	
-	    	List<Integer> list = randomZombieLocation();
-	    	int x = (int) list.get(0);
-	    	int y = (int) list.get(1);
+	    	Point point = randomZombieLocation();
+	    	int x = point.x;
+	    	int y = point.y;
 	    	
 	    	double speed = 0.3 * Math.random();
 	    	if (speed < 0.05)
@@ -262,15 +284,20 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 		            BitmapFactory.decodeResource(getResources(), R.drawable.enemy),
 		            x,
 		            y,
-		            speed
+		            speed,
+		            20
 		    );
 	    	addEnemy(enemy);
 	    	lastMeasuredTime = System.currentTimeMillis();
+	    	if (zombieSpawn > 100)
+	    		zombieSpawn = zombieSpawn - 100;
+	    	else if (zombieSpawn < 100 && zombieSpawn > 10)
+	    		zombieSpawn = zombieSpawn - 10;
     	}
     }
     
-    public List<Integer> randomZombieLocation() {
-    	List<Integer> list = new ArrayList<Integer>();
+    public Point randomZombieLocation() {
+    	Point point = new Point();
     	int side = 0;
     	int x = 0;
     	int y = 0;
@@ -294,29 +321,25 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     	if (side == 1) {
     		x = screenWidth;
     		y = (int) (screenHeight*Math.random());
-    		list.add(x);
-    		list.add(y);
+    		point.set(x, y);
     	}
     	else if (side == 2) {
     		x = 0;
     		y = (int) (screenHeight*Math.random());
-    		list.add(x);
-    		list.add(y);
+    		point.set(x, y);
     	}
     	else if (side == 3) {
     		y = 0;
     		x = (int) (screenWidth*Math.random());
-    		list.add(x);
-    		list.add(y);
+    		point.set(x, y);
     	}
     	else if (side == 4) {
     		y = screenHeight;
     		x = (int) (screenWidth*Math.random());
-    		list.add(x);
-    		list.add(y);
+    		point.set(x, y);
     	}
     	
-    	return list;
+    	return point;
     	
     }
     

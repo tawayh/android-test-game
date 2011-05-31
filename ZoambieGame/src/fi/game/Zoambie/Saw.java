@@ -10,20 +10,41 @@ public class Saw {
         //private Rect sourceRect;  // Animaatioissa tullaan tarvitsemaan
         //private Rect destRect;    // Animaatioissa tullaan tarvitsemaan
         private double direction;
-        
+        private int width;
+        private int height;
+        private Point killPoint;
 
-
         
-        // Konstruktori
+        
+		// Konstruktori
         public Saw(Bitmap saw, float x, float y){
                 this.bitmap = saw;
                 this.x = x;
                 this.y = y;
-        }               
+                this.width = saw.getWidth();
+                this.height = saw.getHeight();
+        }     
         
 
-        //Getterit ja setterit alempana
+        
+        public int getWidth() {
+			return width;
+		}
 
+
+		public void setWidth(int width) {
+			this.width = width;
+		}
+
+
+		public int getHeight() {
+			return height;
+		}
+
+
+		public void setHeight(int height) {
+			this.height = height;
+		}          
         
         public Bitmap getBitmap() {
                 return this.bitmap;
@@ -45,6 +66,21 @@ public class Saw {
                 return y;
         }
 
+        
+        public void setKillPoint() {
+        	Point p = new Point();
+        	int x = 0;
+        	int y = 0;
+        	//x = ((int) (getX() + (Math.cos(getDirection()) * 50)) );
+			//y = ((int) (getY() + (Math.sin(-getDirection()) * 50)) );
+			x = 100;
+			y = 100;
+        	p.set(x, y);
+			
+        }
+        public Point getKillPoint() {
+        	return this.killPoint;
+        }
 
 	public void setY(float y) {
 		this.y = y;
