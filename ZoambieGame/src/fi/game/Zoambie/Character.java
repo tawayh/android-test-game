@@ -7,32 +7,47 @@ public class Character {
 	private Bitmap bitmap;      // Hahmon kuva
 	private float x;			// X-sijainti
 	private float y;			// Y-sijainti
-	private double speed;		// Hahmon nopeus ??
-	//private Rect sourceRect;	// Animaatioissa tullaan tarvitsemaan
-	//private Rect destRect;	// Animaatioissa tullaan tarvitsemaan
-	private double direction;
-	private int health;
-	private int height;
-	private int width;
-	private double distance;	// Zombin etäisyys pelaajaan (vain zombeille)
-
+	private double speed;		// Hahmon nopeus
+	private Rect src;			// Alue bitmapista, mistä hahmon animaatio frame saadaan
+	private Rect dst;			// Alue mihin hahmon piirretään (siis sijainti)
+	private double direction;	// Hahmon suunta
+	private int health;			// Hahmon healtti
+	private int height;			// Hahmon korkeus
+	private int width;			// Hahmon leveys
+	private double distance;	// Zombin etäisyys pelaajaan (vain zombeille) TODO ilmeisesti ei enää tarvita
+	private int blockNumber;	// Missä lohkossa hahmo on
+	private int currentFrame;	// Nykyinen animaatio frame
+	private int numberOfFrames;	// Kuinka monta framea on animaatiossa
+	private long lastAnimated;	// Milloin viimeksi animaatio päivitettiin
+	private int type;			// 0 = pelaaja 1 = perusZombi 2 = nopeaZombi 3 = isoZombi
 	
 	// Konstruktori
-	public Character(Bitmap bitmap, int x, int y, double speed, int health){
+	public Character(Bitmap bitmap, int x, int y, double speed, int health, int numberOfFrames, int width, int height, int type){
 		this.bitmap = bitmap;
-		this.height = bitmap.getHeight();
-		this.width = bitmap.getWidth();
+		this.height = height;
+		this.width = width;
 		this.x = x;
 		this.y = y;
 		this.speed = speed;
 		this.health = health;
-		this.distance = 100;	// debugging reasons
-								// Jos ei aseteta, niin zombit kuolevat heti luodessa
+		this.blockNumber = 0;
+		this.distance = 100;	
+		this.src = new Rect(0, 0, 40, 51);
+		this.numberOfFrames = numberOfFrames;
+		this.type = type;
 	}		
 	
 
 
 	
+	public int getBlockNumber() {
+		return blockNumber;
+	}
+
+	public void setBlockNumber(int blockNumber) {
+		this.blockNumber = blockNumber;
+	}
+
 	public int getHeight() {
 		return height;
 	}
@@ -48,6 +63,62 @@ public class Character {
 	public void setWidth(int width) {
 		this.width = width;
 	}
+
+	public Rect getSrc() {
+		return src;
+	}
+
+
+
+
+	public void setSrc(Rect src) {
+		this.src = src;
+	}
+
+
+
+
+	public Rect getDst() {
+		return dst;
+	}
+
+
+
+
+	public void setDst(Rect dst) {
+		this.dst = dst;
+	}
+
+
+
+
+	public int getCurrentFrame() {
+		return currentFrame;
+	}
+
+
+
+
+	public void setCurrentFrame(int currentFrame) {
+		this.currentFrame = currentFrame;
+	}
+
+
+
+
+	public int getNumberOfFrames() {
+		return numberOfFrames;
+	}
+
+
+
+
+	public void setNumberOfFrames(int numberOfFrames) {
+		this.numberOfFrames = numberOfFrames;
+	}
+
+
+
 
 	public Bitmap getBitmap() {
 		return this.bitmap;
@@ -108,20 +179,17 @@ public class Character {
 
 	public void updateMovement(double x, double y) {
 		if (this.health > 0) {
-			//pelaaja liikutetaan -1 arvoilla
-			//Suunta on valmiiksi laskettu SensorEventissä
-			if (x != -1 && y != -1) {
+				if (x != -1 && y != -1) {
+					
+					double dy = (double) y - (double) this.y;
+					double dx = (double) x - (double) this.x;
 				
-				double dy = (double) y - (double) this.y;
-				double dx = (double) x - (double) this.x;
-			
-				setDirection( Math.atan2(dy, dx)  + (float)Math.PI );
-			}
-
-			setX((float) (this.x + (Math.cos(getDirection()) * -this.speed)) );
-			setY((float) (this.y + (Math.sin(getDirection()) * -this.speed)) );
+					setDirection( Math.atan2(dy, dx)  + (float)Math.PI );
+				}
+	
+				setX((float) (this.x + (Math.cos(getDirection()) * -this.speed)) );
+				setY((float) (this.y + (Math.sin(getDirection()) * -this.speed)) );
 		}
-
 	}
 	
 	
@@ -174,6 +242,34 @@ public class Character {
 	}
 	
 	
+	public long getLastAnimated() {
+		return lastAnimated;
+	}
+
+
+
+
+	public void setLastAnimated(long lastAnimated) {
+		this.lastAnimated = lastAnimated;
+	}
+
+
+
+
+	public int getType() {
+		return type;
+	}
+
+
+
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+
+
+
 	public boolean collisionPlayer(Character player) {
 		boolean collision = false;
 		
@@ -239,8 +335,10 @@ public class Character {
 					if (getX() <= xx  &&  getY() <= yy) {
 						collision = true;
 						get_damage(1);
-						setX((float) (this.x + (Math.cos(getDirection()) * (this.speed))*10) );
-						setY((float) (this.y + (Math.sin(getDirection()) * (this.speed))*10) );
+						if (this.type != 3) {	//isot zombit ei lennä taaksepäin
+							setX((float) (this.x + (Math.cos(getDirection()) * 10 )));
+							setY((float) (this.y + (Math.sin(getDirection()) * 10 )));
+						}
 						
 					}
 				}
@@ -248,8 +346,10 @@ public class Character {
 					if (getX() <= xx  &&  getY() + getHeight()  >= yy) {
 						collision = true;
 						get_damage(1);
-						setX((float) (this.x + (Math.cos(getDirection()) * (this.speed))*10) );
-						setY((float) (this.y + (Math.sin(getDirection()) * (this.speed))*10) );
+						if (this.type != 3) {	//isot zombit ei lennä taaksepäin
+							setX((float) (this.x + (Math.cos(getDirection()) * 10 )));
+							setY((float) (this.y + (Math.sin(getDirection()) * 10 )));
+						}
 					}
 				}
 			}
@@ -258,22 +358,67 @@ public class Character {
 					if (getX() + getWidth() >= xx   &&  getY() <= yy) {
 						collision = true;
 						get_damage(1);
-						setX((float) (this.x + (Math.cos(getDirection()) * (this.speed))*10) );
-						setY((float) (this.y + (Math.sin(getDirection()) * (this.speed))*10) );
+						if (this.type != 3) {	//isot zombit ei lennä taaksepäin
+							setX((float) (this.x + (Math.cos(getDirection()) * 10 )));
+							setY((float) (this.y + (Math.sin(getDirection()) * 10 )));
+						}
 					}
 				}
 				else {
 					if (getX() + getWidth() >= xx   &&  getY() + getHeight()  >= yy) {
 						collision = true;
 						get_damage(1);
-						setX((float) (this.x + (Math.cos(getDirection()) * (this.speed))*10) );
-						setY((float) (this.y + (Math.sin(getDirection()) * (this.speed))*10) );
+						if (this.type != 3) {	//isot zombit ei lennä taaksepäin
+							setX((float) (this.x + (Math.cos(getDirection()) * 10 )));
+							setY((float) (this.y + (Math.sin(getDirection()) * 10 )));
+						}
 					}
 				}
 			}
-			
 		}
 		return collision;
+	}
+	
+	public void updateAnimation(Long time) {
+		if (time > lastAnimated + 100) {
+			this.currentFrame++;
+			if (this.currentFrame > this.numberOfFrames-1)
+				this.currentFrame = 0;
+			this.src.left = this.width * this.currentFrame;
+			this.src.right = this.src.left + this.width ;
+			this.lastAnimated = time;
+		}
+	}
+	
+	
+	public void draw(Canvas canvas) {
+		//canvas.drawBitmap(bitmap, src, dst, null);
+		//src = new Rect(42, 0, 81, 51);
+		Paint paint = null;
+		if (type < 2)
+			dst = new Rect((int) this.x,  (int) this.y , (int) this.x + this.width, (int) this.y + this.height);
+		else if (type == 2) {
+			dst = new Rect((int) this.x,  (int) this.y , (int) this.x + this.width, (int) this.y + this.height);
+			paint = new Paint();	
+			ColorMatrix cm = new ColorMatrix();
+        	cm.setScale (1f, 0.6f, 1f, 1f);
+        	ColorMatrixColorFilter cmcf = new ColorMatrixColorFilter(cm);
+        	paint.setColorFilter(cmcf);
+			paint.setColor(Color.MAGENTA);
+		}
+		else if (type == 3) {
+			dst = new Rect((int) this.x,  (int) this.y , (int) this.x + (this.width*2), (int) this.y + (this.height*2));
+			paint = new Paint();	
+			ColorMatrix cm = new ColorMatrix();
+        	cm.setScale ((0.7f * ((float)health/1000f)), (0.7f * ((float)health/1000f)), 0.7f, 1f);
+        	ColorMatrixColorFilter cmcf = new ColorMatrixColorFilter(cm);
+        	paint.setColorFilter(cmcf);
+			paint.setColor(Color.MAGENTA);
+		}
+		canvas.drawBitmap(bitmap, src, dst, paint);
+		paint = null;
+		//canvas.drawBitmap(getBitmap(), getX(), getY(), null);
+
 	}
 	
 }

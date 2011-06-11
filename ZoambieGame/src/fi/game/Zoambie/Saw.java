@@ -13,7 +13,7 @@ public class Saw {
         private int width;
         private int height;
         private Point killPoint;
-
+        private double targetDirection;
         
         
 		// Konstruktori
@@ -97,13 +97,49 @@ public class Saw {
 		return this.direction;
 	}
 	
-	public void updateDirection(float x1, float y1, float x2, float y2) {
-		float direction = 0;
-		
-		direction = (float) Math.toDegrees( Math.atan2(y2-y1, x2-x1) );
+	public void updateTargetDirection(float x1, float y1, float x2, float y2) {
+		float targetDirection = 0;
+		targetDirection = (float) Math.toDegrees( Math.atan2(y2-y1, x2-x1) );
 		//setKillPoint(Math.atan2(-y2-y1, x2-x1)  + (float)Math.PI );
+		this.targetDirection = targetDirection;
 		
-		this.direction = direction;
+	}
+	
+	public void updateDirection() {
 		
+		if (this.targetDirection < -90 && this.direction > 90) {
+			if (this.direction + 8 > 90)
+				setDirection(-180);
+			else
+				setDirection(direction + 8);
+		}
+		else if (this.targetDirection > 90 && this.direction < -90) {
+			if (this.direction - 8 < -180)
+				setDirection(180);
+			else
+				setDirection(direction - 8);
+		}
+		else {
+			double temp = this.direction - this.targetDirection;
+			if (temp < 25 || temp > -25) {
+				if (temp < 0)
+					setDirection(direction + 8);
+				else
+					setDirection(direction - 8);
+			}
+		}
+	
+	}
+	
+	public void draw(Canvas canvas, Character player) {
+		Matrix m = new Matrix();
+    	Bitmap bmp = Bitmap.createBitmap(getBitmap(), 0, 0, getWidth(), getHeight());
+    	m.reset();
+    	m.setRotate((float)getDirection(), 50f, 20f);
+    	m.postTranslate(player.getX()-30, player.getY()+5);
+    	canvas.drawBitmap(bmp, m, null);
+    	
+    	setX(player.getX()-30);
+    	setY(player.getY()+5);
 	}
 }
