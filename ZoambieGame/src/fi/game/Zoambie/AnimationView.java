@@ -81,6 +81,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 			        //Päivitetään pelaajan animaatiota
         			player.updateAnimation(System.currentTimeMillis());
 			        
+			        
 			        frames ++;
 			        
 			        //FPS laskenta
@@ -105,12 +106,13 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 			        	for (int i = 0; i < enemyList.size(); i++) {
 			        		try {
 			        			Character c = enemyList.get(i);
+			        				
 			        			
 			        			//Päivitetään zombin animaatiota
 			        			c.updateAnimation(System.currentTimeMillis());
-			        			
-			        			//Zombien liikkuminen ja collision detection
-			        				c.updateMovement(player.getX(), player.getY());
+
+
+			        			c.updateMovement(player.getX(), player.getY());
 
 				        		if (c.collisionPlayer(player)) {
 				        			if (c.getType() == 1) {
@@ -210,7 +212,9 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     private AnimationThread thread;
     public Character player;
     public Bitmap background;
-    public Bitmap enemyBmp;
+    public Bitmap enemyBmp1;
+    public Bitmap enemyBmp2;
+    public Bitmap enemyBmp3;
     public Saw saw;
     long lastMeasuredTime = System.currentTimeMillis();;
     LinkedList<Character> enemyList = new LinkedList<Character>();
@@ -237,7 +241,9 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
         sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensorList;
         sensorList = sensorManager.getSensorList(Sensor.TYPE_ORIENTATION);
-        enemyBmp = Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.enemy));
+        enemyBmp1 = Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.enemy));
+        enemyBmp2 = Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.enemy2));
+        enemyBmp3 = Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.enemy3));
         try {
         	sensorManager.registerListener(orientationSensorEventListener, sensorList.get(0), SensorManager.SENSOR_DELAY_GAME);
         } catch(IndexOutOfBoundsException e) {
@@ -302,7 +308,7 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
     	if (System.currentTimeMillis() - lastMeasuredTime > zombieSpawn   &&  enemyList.size() < maxZombies) {
 
     		//Zombien spawnaus
-	    	Character enemy = Control.createZombie(enemyBmp, screenWidth, screenHeight);
+	    	Character enemy = Control.createZombie(enemyBmp1, enemyBmp2, enemyBmp3, screenWidth, screenHeight);
 	    	addEnemy(enemy);
 	    	lastMeasuredTime = System.currentTimeMillis();
 	    	if (zombieSpawn > 100)
@@ -361,4 +367,5 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
             }
         }
     }
+
 }
