@@ -32,7 +32,7 @@ public class Character {
 		this.health = health;
 		this.blockNumber = 0;
 		this.distance = 100;	
-		this.src = new Rect(0, 0, 40, 51);
+		this.src = new Rect(0, 0, this.width, this.height);
 		this.numberOfFrames = numberOfFrames;
 		this.type = type;
 	}		
@@ -399,21 +399,26 @@ public class Character {
 			dst = new Rect((int) this.x,  (int) this.y , (int) this.x + this.width, (int) this.y + this.height);
 		else if (type == 2) {
 			dst = new Rect((int) this.x,  (int) this.y , (int) this.x + this.width, (int) this.y + this.height);
+			/*
 			paint = new Paint();	
 			ColorMatrix cm = new ColorMatrix();
         	cm.setScale (1f, 0.6f, 1f, 1f);
         	ColorMatrixColorFilter cmcf = new ColorMatrixColorFilter(cm);
         	paint.setColorFilter(cmcf);
 			paint.setColor(Color.MAGENTA);
+			*/
 		}
 		else if (type == 3) {
-			dst = new Rect((int) this.x,  (int) this.y , (int) this.x + (this.width*2), (int) this.y + (this.height*2));
+			
+			dst = new Rect((int) this.x,  (int) this.y , (int) this.x + this.width, (int) this.y + this.height);
+			
 			paint = new Paint();	
 			ColorMatrix cm = new ColorMatrix();
         	cm.setScale ((0.7f * ((float)health/1000f)), (0.7f * ((float)health/1000f)), 0.7f, 1f);
         	ColorMatrixColorFilter cmcf = new ColorMatrixColorFilter(cm);
         	paint.setColorFilter(cmcf);
-			paint.setColor(Color.MAGENTA);
+			//paint.setColor(Color.MAGENTA);
+			
 		}
 		canvas.drawBitmap(bitmap, src, dst, paint);
 		paint = null;
