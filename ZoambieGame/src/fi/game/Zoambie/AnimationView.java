@@ -81,21 +81,6 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 			        //Päivitetään pelaajan animaatiota
         			player.updateAnimation(System.currentTimeMillis());
 			        
-			    	//Päivitetään lohkojen suunta
-			        for (int i = 0; i<8; i++) {
-			        	gameArea[i].updateDirection(player);
-			        }
-			        
-        			//Päivitetään tarvittaessa pelaajan lohko toiseen
-        			if (!gameArea[player.getBlockNumber()].getRect().contains((int)player.getX(), (int)player.getY())){
-        				for (int j = 0; j<8; j++) {
-        					if (gameArea[j].getRect().contains((int)player.getX(), (int)player.getY())){
-        						player.setBlockNumber(j);
-        						break;
-        					}
-        				}
-        			}
-			        
 			        frames ++;
 			        
 			        //FPS laskenta
@@ -120,27 +105,13 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 			        	for (int i = 0; i < enemyList.size(); i++) {
 			        		try {
 			        			Character c = enemyList.get(i);
-			        				
-			        			//Päivitetään tarvittaessa zombin lohko toiseen
-			        			if (!gameArea[c.getBlockNumber()].getRect().contains((int)c.getX(), (int)c.getY())){
-			        				for (int j = 0; j<8; j++) {
-			        					if (gameArea[j].getRect().contains((int)c.getX(), (int)c.getY())){
-			        						c.setBlockNumber(j);
-			        						break;
-			        					}
-			        				}
-			        			}
 			        			
 			        			//Päivitetään zombin animaatiota
 			        			c.updateAnimation(System.currentTimeMillis());
 			        			
-			        			//Katsotaan onko pelaaja samassa lohkossa kuin zombi
-			        			if (player.getBlockNumber() == c.getBlockNumber())
+			        			//Zombien liikkuminen ja collision detection
 			        				c.updateMovement(player.getX(), player.getY());
-			        			else { 
-			        				c.setDirection(gameArea[c.getBlockNumber()].getDirection());
-			        				c.updateMovement(-1, -1);
-			        			}
+
 				        		if (c.collisionPlayer(player)) {
 				        			if (c.getType() == 1) {
 				        				player.get_damage(5);
@@ -230,7 +201,6 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
 	public int fps;
 	public int wanted_fps = 25;
 	public long nextCount;
-	public Block[] gameArea = new Block[8];
 	public int zombieSpawn = 2000;
 	public int killedZombies = 0;
 	public int maxZombies = 1000;
@@ -366,7 +336,6 @@ class AnimationView extends SurfaceView implements SurfaceHolder.Callback {
             screenWidth = width;
             screenHeight = height;
             background = Bitmap.createScaledBitmap(background, width, height, true);
-            gameArea = Control.createGameArea();
         }
     	
     }

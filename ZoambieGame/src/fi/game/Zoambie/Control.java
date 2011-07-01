@@ -42,16 +42,6 @@ public class Control {
         	float [] pos3 = {350,50,360,50,370,50,380,50};
         	canvas.drawPosText(""+fps, pos3, p);	     
         	
-        	//piirretään pelialueet
-        	/*
-        	p = new Paint();
-        	p.setColor(Color.BLACK);
-        	p.setAlpha(100);
-        	p.setStrokeWidth(2f);
-        	for (int i = 0; i<8; i++){
-        		canvas.drawRect(gameArea[i].getRect(), p);
-        	}
-        	*/
         }
         
         public static void drawGameOver(Canvas canvas) {
@@ -187,44 +177,5 @@ public class Control {
         	return point;
         	
         }
-        
-        
-        
-        
-    	public static Block[] createGameArea() {
-    		//Jaetaan pelialue kahdeksaan osaan
-    		/*
-    		 ____________________
-    		 | 1  | 2  | 3  | 4  |
-    		 |____|____|____|____|
-    		 | 5  | 6  | 7  | 8  |
-    		 |____|____|____|____| 
-    		 
-    		 */
-    		
-    		Block[] gameArea = new Block[8];
-    		
-    		/*
-    		gameArea[0] = new Block(new Rect(-50,-50, (screenWidth/4)*1, (screenHeight/2)*1));
-    		gameArea[1] = new Block(new Rect((screenWidth/4)*1,-50, (screenWidth/4)*2, (screenHeight/2)*1));
-    		gameArea[2] = new Block(new Rect((screenWidth/4)*2,-50, (screenWidth/4)*3, (screenHeight/2)*1));
-    		gameArea[3] = new Block(new Rect((screenWidth/4)*3,-50, (screenWidth/4)*4, (screenHeight/2)*1));
-    		gameArea[4] = new Block(new Rect(-50,-50, (screenWidth/4)*1, (screenHeight/2)*2 + 50));
-    		gameArea[5] = new Block(new Rect((screenWidth/4)*1,-50, (screenWidth/4)*2, (screenHeight/2)*2 + 50));
-    		gameArea[6] = new Block(new Rect((screenWidth/4)*2,-50, (screenWidth/4)*3, (screenHeight/2)*2 + 50));
-    		gameArea[7] = new Block(new Rect((screenWidth/4)*3,-50, (screenWidth/4)*4, (screenHeight/2)*2 + 50));
-    		*/
-    		
-    		gameArea[0] = new Block(new Rect(-50,-50,198,238));
-    		gameArea[1] = new Block(new Rect(200,-50,398,238));
-    		gameArea[2] = new Block(new Rect(400,-50,598,238));
-    		gameArea[3] = new Block(new Rect(600,-50,850,238));
-    		gameArea[4] = new Block(new Rect(-50,240,198,500));
-    		gameArea[5] = new Block(new Rect(200,240,398,500));
-    		gameArea[6] = new Block(new Rect(400,240,598,500));
-    		gameArea[7] = new Block(new Rect(600,240,850,500));
-    		
-    		
-    		return gameArea;
-    	}
+
 }
